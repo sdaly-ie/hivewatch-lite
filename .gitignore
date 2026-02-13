@@ -1,0 +1,13 @@
+# Gradle (do not upload caches or build outputs)
+.gradle/
+build/
+
+# Eclipse (do not upload IDE files or compiled output)
+bin/
+.settings/
+.classpath
+.project
+
+# Logs
+*.log
+
