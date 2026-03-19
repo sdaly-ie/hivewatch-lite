@@ -219,7 +219,7 @@ Use the following settings:
 
 ## Example API routes
 
-The following routes were reviewed during local testing. Direct browser testing works well for `GET` routes, while `POST`, `PUT`, and `DELETE` are better tested in Postman.
+The following example routes are supported by the current controller mappings. Representative GET routes were tested locally in the browser and Postman, while POST, PUT, and DELETE operations are intended to be tested in Postman.
 
 ### Hive routes
 
@@ -262,13 +262,13 @@ PUT    /api/readings/hive/{hiveId}/apply-offset?delta=0.5
 
 The screenshot below shows the `GET /api/hives` endpoint returning seeded hive data successfully during local testing.
 
-![Postman API proof](docs/images/postman-get-all-hives.png)
+![Postman API proof](docs/images/postman-get-all-hives.jpg)
 
 ### Persistence proof in H2
 
 The screenshot below shows seeded `HIVE` and `TEMPERATURE_READING` records in the H2 development database.
 
-![H2 seeded data proof](docs/images/h2-seeded-data.png)
+![H2 seeded data proof](docs/images/h2-seeded-data.jpg)
 
 ## What this project already shows to employers
 
