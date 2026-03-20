@@ -131,11 +131,9 @@ public class TemperatureReadingServiceImpl implements TemperatureReadingService 
         requireHiveExists(hiveId);
         if (recordedAt == null) throw new IllegalArgumentException("recordedAt is required");
 
-        Hive hive = hiveRepository.findById(hiveId).orElseThrow(); 
+        Hive hive = hiveRepository.findById(hiveId).orElseThrow();
 
         TemperatureReading reading = new TemperatureReading(temperature, recordedAt, hive);
-        // Hive has many readings and each reading belongs to one hive
-        hive.addTemperatureReading(reading);
 
         return save(reading);
     }
