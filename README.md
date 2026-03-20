@@ -2,40 +2,44 @@
 
 ## Overview
 
-HiveWatch Lite is a Spring Boot REST application for managing beehives and hive temperature readings.
+HiveWatch Lite is a full-stack beehive monitoring prototype built with a Spring Boot REST API and a React + TypeScript front end.
 
-It was built for the **CT5221 Full Stack App Development** module using a realistic beekeeping domain. The repository currently focuses on the back end and demonstrates layered application structure, REST API design, service-layer business rules, JPA-based persistence, and DTO-based request and response handling.
+It was built for the **CT5221 Full Stack Application Development** module using a realistic beekeeping domain. The project manages two related entities:
 
-The next planned stage is a React front end that will consume these APIs and turn the project into a clearer end-to-end full-stack application.
+- `Hive`
+- `TemperatureReading`
+
+The application supports full CRUD operations for both entities and includes a relationship update workflow that allows a temperature reading to be reassigned to a different hive.
+
+The repository now demonstrates both the back end and the front end of the application, showing API design, service-layer business rules, JPA-based persistence, DTO-based request and response handling, and React-based UI integration.
 
 ## Why this project matters
 
 This repository is intended to show practical early-career software engineering skills across:
 
 - Java and Spring Boot
+- React and TypeScript
 - REST API design
 - layered architecture using controller, service, repository, entity, and DTO classes
 - relational modelling with JPA (Java Persistence API)
 - local development workflow using H2
+- front-end and back-end integration
 - service-layer validation and business rules beyond thin CRUD only
-- preparation for a front-end integration phase
 
 ## Current project status
 
-### Implemented so far
+### Implemented
 
 - Spring Boot REST API
+- React + TypeScript front end
 - Two related entities: `Hive` and `TemperatureReading`
 - CRUD operations for both entities
 - search and filtering endpoints for hives and readings
 - relationship handling between hives and readings
+- relationship reassignment for temperature readings through the UI
 - business-rule validation in the service layer
 - H2 in-memory database for development and local testing
 - separate MariaDB example configuration for optional future/local use
-
-### Planned next step
-
-- React front end for viewing, creating, editing, deleting, and managing entity relationships through the API
 
 ## Domain model
 
@@ -62,32 +66,41 @@ Fields:
 
 ## Architecture
 
-This project uses a layered Spring Boot structure with controllers exposing the API, services handling business logic, repositories handling persistence, DTOs shaping request and response payloads, and entities representing the core domain.
+This project uses a layered full-stack structure. The React front end provides the user interface, calls the Spring Boot REST API, and displays live data returned from the back end. The back end uses controllers to expose endpoints, services to apply business logic, repositories to handle persistence, DTOs to shape payloads, and entities to represent the domain model.
 
 ```mermaid
 flowchart TD
-    A["Client / Postman"] --> B["HiveController"]
-    A --> C["TemperatureReading<br/>Controller"]
+    A["User in Browser"] --> B["React + TypeScript Front End<br/>Vite dev server"]
+    B --> C["HiveWatch API Client"]
+    C --> D["HiveController"]
+    C --> E["TemperatureReadingController"]
 
-    B --> D["HiveService"]
-    C --> E["TemperatureReading<br/>Service"]
+    D --> F["HiveService / HiveServiceImpl"]
+    E --> G["TemperatureReadingService / TemperatureReadingServiceImpl"]
 
-    D --> F["HiveRepository"]
-    D --> G["HiveDTO /<br/>WriteHiveDTO"]
+    F --> H["HiveRepository"]
+    G --> I["TemperatureReadingRepository"]
 
-    E --> H["TemperatureReading<br/>Repository"]
-    E --> I["TemperatureReadingDTO /<br/>WriteTemperatureReadingDTO"]
+    F --> J["HiveDTO / WriteHiveDTO"]
+    G --> K["TemperatureReadingDTO / WriteTemperatureReadingDTO"]
 
-    F --> J[("H2 / MariaDB")]
-    H --> J
+    H --> L[("H2 / MariaDB")]
+    I --> L
 
-    J --> K["Hive"]
-    J --> L["TemperatureReading"]
+    L --> M["Hive"]
+    L --> N["TemperatureReading"]
 ```
 
 ## Application layers
 
-### Entities
+### Front end
+- React
+- TypeScript
+- Vite
+- API client layer for HTTP requests
+- reusable components for forms, tables, dialogs, and relationship updates
+
+### Back end entities
 - `Hive`
 - `TemperatureReading`
 
@@ -144,6 +157,31 @@ Implemented operations:
 - assign a reading to a different hive
 - apply a temperature offset across all readings for a hive
 
+## Front-end capabilities
+
+### Hive views
+- view all hives
+- create a new hive
+- edit hive name and location
+- delete a hive where allowed by back-end rules
+
+### Temperature reading views
+- view all readings
+- create a new reading
+- edit a reading
+- delete a reading
+- filter readings by hive
+
+### Relationship workflow
+- reassign a temperature reading to a different hive using the **Assign Hive** action
+
+### Usability improvements implemented
+- front-end forms and validation feedback
+- refresh after create, update, delete, and relationship change actions
+- basic navigation between hive and reading views
+- clearer user-facing presentation for demos and portfolio review
+- consistent displayed date format in the UI using `dd/mm/yyyy`
+
 ## Business rules implemented
 
 ### Hive rules
@@ -166,6 +204,7 @@ Implemented operations:
 
 ## Technology stack
 
+### Back end
 - Java 25 toolchain as currently configured in Gradle
 - Spring Boot 3
 - Spring Web
@@ -173,15 +212,27 @@ Implemented operations:
 - H2 Database for development and local testing
 - MariaDB driver included for optional assignment-target persistence
 - Gradle
+
+### Front end
+- React
+- TypeScript
+- Vite
+
+### Development and testing
 - Postman for local API testing
+- browser-based testing of the React UI
+- H2 console for development database inspection
 
 ## Running the project locally
 
 ### Prerequisites
 - JDK 25 installed
+- Node.js and npm installed
 - Gradle wrapper included in the repository
 
-### Start the application
+### Start the back end
+
+From the repository root:
 
 Windows:
 
@@ -195,19 +246,41 @@ macOS or Linux:
 ./gradlew bootRun
 ```
 
+The Spring Boot API runs locally at:
+
+```text
+http://localhost:8080
+```
+
 The project includes a safe local development configuration using an in-memory H2 database, so no additional database setup is required for a basic local run.
 
-## Local development
+### Start the front end
 
-By default, the application runs on:
+From the `frontend` folder:
 
-`http://localhost:8080`
+```bash
+npm install
+npm run dev
+```
 
-This project currently exposes REST API endpoints and the H2 console. It does **not** yet include a browser-based home page at the root URL, so a `404` at `http://localhost:8080/` is expected at this stage.
+The React front end usually runs locally at:
+
+```text
+http://localhost:5173
+```
+
+### Local development notes
+
+- `http://localhost:5173` serves the React front end
+- `http://localhost:8080` serves the Spring Boot back end and REST API
+- a `404` at `http://localhost:8080/` is expected because the back end exposes the API and H2 console, not a browser home page
+- the React app consumes the API from the back end during local development
 
 ### H2 console (local development only)
 
-`http://localhost:8080/h2-console`
+```text
+http://localhost:8080/h2-console
+```
 
 Use the following settings:
 
@@ -219,7 +292,7 @@ Use the following settings:
 
 ## Example API routes
 
-The following example routes are supported by the current controller mappings. Representative GET routes were tested locally in the browser and Postman, while POST, PUT, and DELETE operations are intended to be tested in Postman.
+The following example routes are supported by the current controller mappings. Representative GET routes were tested locally in the browser and Postman, while POST, PUT, and DELETE operations are intended to be tested in Postman or through the React front end.
 
 ### Hive routes
 
@@ -259,20 +332,18 @@ PUT    /api/readings/hive/{hiveId}/apply-offset?delta=0.5
 ## Current evidence
 
 ### API proof in Postman
-
 The screenshot below shows the `GET /api/hives` endpoint returning seeded hive data successfully during local testing.
 
 ![Postman API proof](docs/images/postman-get-all-hives.jpg)
 
 ### Persistence proof in H2
-
 The screenshot below shows seeded `HIVE` and `TEMPERATURE_READING` records in the H2 development database.
 
 ![H2 seeded data proof](docs/images/h2-seeded-data.jpg)
 
 ## What this project already shows to employers
 
-Even before the React stage is added, this repository already demonstrates:
+This repository demonstrates:
 
 - a realistic domain rather than a generic tutorial app
 - a clean layered back-end structure
@@ -281,78 +352,32 @@ Even before the React stage is added, this repository already demonstrates:
 - service-layer validation and business logic
 - relational modelling with a one-to-many association
 - search, filtering, aggregation, and batch update behaviour
-- local development workflow using H2 and Postman
+- a working React front end connected to a Spring Boot API
+- relationship editing through the UI
+- local development workflow using H2, Postman, and React
 
-## Planned React front end upgrade
+## Roadmap
 
-The next planned phase is to add a React front end in line with the CT5221 brief.
+Planned next steps for the project:
 
-The brief requires a front end that uses the back-end APIs and, for each entity class, provides:
-
-- a view of all data
-- a way to create a new record
-- a way to edit a record
-- a way to delete a record
-- persistence through the API with the UI refreshed to stay up to date
-
-It also requires that at least one relationship can be created or modified from the front end.
-
-### Planned React scope for HiveWatch Lite
-
-#### Hive views
-- view all hives
-- create a new hive
-- edit hive name and location
-- delete hive where allowed by back-end rules
-- search hives by name and location
-
-#### Temperature reading views
-- view all readings
-- create a new reading
-- edit a reading
-- delete a reading
-- filter readings by hive
-- view latest reading and recent hive metrics
-
-#### Relationship workflow
-At least one relationship workflow will be added through the UI, most likely one of these:
-- create a temperature reading directly against a selected hive
-- reassign a temperature reading to a different hive
-
-#### Usability improvements planned
-- clearer forms and validation messages
-- refresh after create, update, and delete actions
-- basic navigation between hive and reading views
-- a more polished user-facing presentation for demos and employers
-
-## Future improvements beyond the React brief
-
-After the React stage, the strongest follow-on improvements would be:
-
-- automated back-end tests for controllers and services
-- front-end tests for React components and API flows
-- API documentation with Swagger / OpenAPI
-- Docker support for easier local setup
-- CI workflow using GitHub Actions
-- better exception response structure using JSON error objects
-- pagination or sorting for readings
-- support for additional sensor data such as humidity, hive weight, or battery status
-- deployment of the front end and back end for a live demo version
-
-## Current limitations
-
-To keep the README honest, the following should be noted:
-
-- no React front end has been added yet
-- there is no browser-based home page at the root URL yet
-- automated test coverage is still minimal
-- no CI pipeline is included yet
-- no Docker containerisation is included yet
-- the current setup is mainly focused on the back end and local development
+- add JUnit tests for the repository, service, and controller layers
+- cover CRUD behaviour, search flows, and update operations across both entities
+- verify exception handling for invalid input, duplicates, future timestamps, and blocked deletes
+- add tests for relationship operations such as assigning a temperature reading to a different hive
 
 ## Repository structure
 
 ```text
+frontend/
+  src/
+    api/
+    components/
+    utils/
+  .env
+  package.json
+  package-lock.json
+  vite.config.ts
+
 src/
   main/
     java/com/hivewatch/hivewatchlite/
@@ -366,9 +391,7 @@ src/
       application.example.properties
   test/
     java/com/hivewatch/hivewatchlite/
+
+docs/
+  images/
 ```
-
-## Notes
-
-This README reflects the project as it currently exists in the repository.
-The React front end is intentionally described as a planned next stage rather than a completed feature.
