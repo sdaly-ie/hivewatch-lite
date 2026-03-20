@@ -4,7 +4,7 @@
 
 HiveWatch Lite is a full-stack beehive monitoring prototype built with a Spring Boot REST API and a React + TypeScript front end.
 
-It was built for the **CT5221 Full Stack Application Development** module using a realistic beekeeping domain. The project manages two related entities:
+It was built for the **CT5221 Full Stack App Development** module using a realistic beekeeping domain. The project manages two related entities:
 
 - `Hive`
 - `TemperatureReading`
@@ -340,6 +340,17 @@ The screenshot below shows the `GET /api/hives` endpoint returning seeded hive d
 The screenshot below shows seeded `HIVE` and `TEMPERATURE_READING` records in the H2 development database.
 
 ![H2 seeded data proof](docs/images/h2-seeded-data.jpg)
+
+## React front end
+
+### Hives screen
+![Hives screen](docs/images/react-hives-screen.jpg)
+
+### Temperature readings screen
+![Temperature readings screen](docs/images/react-readings-screen.jpg)
+
+### Relationship update
+![Assign Hive dialog](docs/images/react-assign-hive-dialog.jpg)
 
 ## What this project already shows to employers
 
