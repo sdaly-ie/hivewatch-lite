@@ -55,6 +55,7 @@ This repository is intended to show practical software development skills across
 This project uses a layered full-stack structure. The React front end provides the user interface, calls the Spring Boot REST API, and displays data returned from the back end. The back end uses controllers to expose endpoints, services to apply business logic, repositories to handle persistence, DTOs to shape payloads, and entities to represent the domain model.
 
 ```mermaid
+
 flowchart TD
     A["User in Browser"] --> B["React + TypeScript Front End<br/>Vite dev server"]
     B --> C["HiveWatch API Client"]
@@ -75,6 +76,7 @@ flowchart TD
 
     L --> M["Hive"]
     L --> N["TemperatureReading"]
+
 ```
 
 ---
@@ -166,6 +168,7 @@ A layered JUnit testing suite was added to the back end to verify repository beh
 - `@DataJpaTest` with H2 for repository tests
 - `@WebMvcTest` with `MockMvc` for controller tests
 - Gradle test execution and HTML test reporting
+- JaCoCo coverage reporting for local coverage analysis
 
 ### Test classes
 The core layered suite spans six test classes:
@@ -177,13 +180,20 @@ The core layered suite spans six test classes:
 - `HiveControllerTest`
 - `TemperatureReadingControllerTest`
 
-A previously verified Gradle HTML report showed the baseline layered suite passing with repository, service, and controller coverage in place. Selected parameterized service tests were then added to strengthen validation coverage further.
+The layered suite was verified successfully across repository, service, and controller levels, and selected parameterized service tests were then added to strengthen validation coverage further.
+
+### Test execution summary
+The screenshot below shows the final Gradle HTML test summary for the back-end suite.
+
+![Gradle test summary](docs/images/gradle-test-summary.jpg)
 
 ### What is being verified
-The automated tests cover:
+The test suite verifies:
 - repository queries, ordering, averages, and batch updates
-- service-layer business rules such as duplicate hive prevention, blocked delete behaviour, required timestamps, timestamp conflicts, and numeric validation rules
+- service-layer business rules such as duplicate hive prevention, blocked delete behaviour, required timestamps, timestamp conflicts, and validation of numeric boundaries
 - controller request and response handling, including expected `201`, `200`, `400`, and `409` outcomes
+
+JaCoCo coverage reporting was added to complement the passing JUnit suite and provide a local view of which parts of the back-end code are currently exercised by automated tests.
 
 ### Boundary-focused testing
 Additional boundary-focused service tests were added for selected validation rules, including:
@@ -192,13 +202,11 @@ Additional boundary-focused service tests were added for selected validation rul
 - offset delta boundaries
 
 ### Test traceability
-A lightweight requirements-to-test traceability document is included at:
+A lightweight [requirements-to-test traceability document](docs/test-traceability.md) is included in the repository.
 
-`docs/test-traceability.md`
+After running `./gradlew test`, open the local Gradle HTML report at `build/reports/tests/test/index.html`.
 
-To view the latest local summary after running the suite, open:
-
-`build/reports/tests/test/index.html`
+After running `./gradlew test`, open the local JaCoCo HTML coverage report at `build/reports/jacoco/test/html/index.html`.
 
 ---
 
@@ -224,6 +232,7 @@ To view the latest local summary after running the suite, open:
 - Spring `MockMvc`
 - H2 in-memory database
 - Gradle test execution and HTML test reporting
+- JaCoCo coverage reporting for local coverage analysis
 - Postman
 - browser-based UI testing
 
@@ -388,7 +397,6 @@ This repository demonstrates:
 ## Possible future enhancements
 
 Potential future improvements include:
-- add JaCoCo coverage reporting
 - optionally add SonarQube quality scanning and a CI quality gate
 - expand integration-style API tests for key end-to-end flows
 - extend automated testing further as the domain model grows
