@@ -2,7 +2,7 @@
 
 HiveWatch Lite is a full-stack beehive monitoring prototype built with a Spring Boot REST API and a React + TypeScript front end.
 
-It was developed for the **CT5221 Full Stack App Development** module using a realistic beekeeping domain. The project manages two related entities:
+It was developed for the **CT5221 Full Stack App Development** module using a realistic beekeeping domain and manages two related entities:
 
 - `Hive`
 - `TemperatureReading`
@@ -27,15 +27,171 @@ This repository is intended to show practical software development skills across
 
 ---
 
+## Running the project locally
+
+This section is written as a step-by-step guide so the project is easy to run for a lecturer, reviewer, or employer.
+
+### Prerequisites
+
+You will need:
+
+- JDK 25 installed
+- Node.js and npm installed
+- the Gradle wrapper already included in the repository
+
+### 1. Start the back end
+
+Open a terminal in the **repository root** and run:
+
+**Windows**
+```bash
+gradlew.bat bootRun
+```
+
+**macOS or Linux**
+```bash
+./gradlew bootRun
+```
+
+This starts the Spring Boot back end on:
+
+```text
+http://localhost:8080
+```
+
+The back end uses an in-memory H2 database for local development, so no separate database setup is needed for a basic run.
+
+### 2. Check that the back end is running
+
+Open the following in your browser:
+
+```text
+http://localhost:8080
+```
+
+You should see a small JSON status response confirming that the **HiveWatch Lite API** is running.
+
+You can also test the API directly at:
+
+```text
+http://localhost:8080/api/hives
+http://localhost:8080/api/readings
+```
+
+### 3. Start the front end
+
+Open a **second terminal** and move into the `frontend` folder:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The React front end usually runs on:
+
+```text
+http://localhost:5173
+```
+
+> If `npm` says it cannot find `package.json`, make sure you are inside the `frontend` folder rather than the repository root.
+
+### 4. Open the application in the browser
+
+Once both parts are running, open:
+
+```text
+http://localhost:5173
+```
+
+Use the following addresses during local development:
+
+- `http://localhost:5173` for the React front end
+- `http://localhost:8080` for the Spring Boot API status endpoint
+- `http://localhost:8080/api/hives` for the hive API
+- `http://localhost:8080/api/readings` for the temperature reading API
+
+### 5. Optional: open the H2 console
+
+The project also exposes the H2 database console locally at:
+
+```text
+http://localhost:8080/h2-console
+```
+
+Use the following settings:
+
+- JDBC URL: `jdbc:h2:mem:testdb`
+- User Name: `sa`
+- Password: blank
+
+> These settings are for local development only.
+
+### 6. Run the automated tests
+
+From the repository root, run:
+
+**Windows**
+```bash
+gradlew.bat cleanTest test
+```
+
+**macOS or Linux**
+```bash
+./gradlew cleanTest test
+```
+
+Then open the generated Gradle HTML test report:
+
+```text
+build/reports/tests/test/index.html
+```
+
+For local code coverage analysis, open the JaCoCo report at:
+
+```text
+build/reports/jacoco/test/html/index.html
+```
+
+---
+
+## Architecture
+
+This project uses a layered full-stack structure.
+
+The React front end provides the user interface, calls the Spring Boot REST API, and displays data returned from the back end. The back end uses controllers to expose endpoints, services to apply business logic, repositories to handle persistence, DTOs to shape payloads, and entities to represent the domain model.
+
+```mermaid
+flowchart TD
+    A["User in Browser"] --> B["React + TypeScript Front End\nVite dev server"]
+    B --> C["HiveWatch API Client"]
+    C --> D["HiveController"]
+    C --> E["TemperatureReadingController"]
+    D --> F["HiveService / HiveServiceImpl"]
+    E --> G["TemperatureReadingService / TemperatureReadingServiceImpl"]
+    F --> H["HiveRepository"]
+    G --> I["TemperatureReadingRepository"]
+    F --> J["HiveDTO / WriteHiveDTO"]
+    G --> K["TemperatureReadingDTO / WriteTemperatureReadingDTO"]
+    H --> L[("H2 / MariaDB")]
+    I --> L
+    L --> M["Hive"]
+    L --> N["TemperatureReading"]
+```
+
+---
+
 ## Key features
 
 ### Back end
+
 - Spring Boot REST API
 - layered structure using controller, service, repository, entity, and DTO classes
 - H2 in-memory database for local development
 - MariaDB example configuration included for optional local or future use
 
 ### Front end
+
 - React + TypeScript UI
 - forms and tables for hives and readings
 - create, edit, delete, and filter workflows
@@ -43,6 +199,7 @@ This repository is intended to show practical software development skills across
 - consistent displayed date formatting in the UI
 
 ### Domain behaviour
+
 - one hive can have many temperature readings
 - each temperature reading belongs to one hive
 - relationship reassignment is supported
@@ -50,40 +207,10 @@ This repository is intended to show practical software development skills across
 
 ---
 
-## Architecture
-
-This project uses a layered full-stack structure. The React front end provides the user interface, calls the Spring Boot REST API, and displays data returned from the back end. The back end uses controllers to expose endpoints, services to apply business logic, repositories to handle persistence, DTOs to shape payloads, and entities to represent the domain model.
-
-```mermaid
-
-flowchart TD
-    A["User in Browser"] --> B["React + TypeScript Front End<br/>Vite dev server"]
-    B --> C["HiveWatch API Client"]
-    C --> D["HiveController"]
-    C --> E["TemperatureReadingController"]
-
-    D --> F["HiveService / HiveServiceImpl"]
-    E --> G["TemperatureReadingService / TemperatureReadingServiceImpl"]
-
-    F --> H["HiveRepository"]
-    G --> I["TemperatureReadingRepository"]
-
-    F --> J["HiveDTO / WriteHiveDTO"]
-    G --> K["TemperatureReadingDTO / WriteTemperatureReadingDTO"]
-
-    H --> L[("H2 / MariaDB")]
-    I --> L
-
-    L --> M["Hive"]
-    L --> N["TemperatureReading"]
-
-```
-
----
-
 ## Application layers
 
 ### Front end
+
 - React
 - TypeScript
 - Vite
@@ -91,20 +218,47 @@ flowchart TD
 - reusable UI components
 
 ### Back end
+
 - entities: `Hive`, `TemperatureReading`
 - DTOs: `HiveDTO`, `TemperatureReadingDTO`, `WriteHiveDTO`, `WriteTemperatureReadingDTO`
 - repositories: `HiveRepository`, `TemperatureReadingRepository`
 - services: `HiveService`, `HiveServiceImpl`, `TemperatureReadingService`, `TemperatureReadingServiceImpl`
-- controllers: `HiveController`, `TemperatureReadingController`
+- controllers: `HiveController`, `TemperatureReadingController`, `HomeController`
+
+---
+
+## Business rules
+
+### Hive rules
+
+- hive name is required
+- hive location is required
+- hive name must be 2 to 50 characters
+- hive location must be 2 to 80 characters
+- hive name must be unique
+- a hive cannot be deleted if temperature readings still exist for it
+
+### Temperature reading rules
+
+- `hiveId` is required when creating or updating a reading
+- temperature is required
+- `recordedAt` is required when recording or updating a reading
+- temperature must be between `-9.0` and `46.5` degrees Celsius
+- `recordedAt` cannot be in the future
+- duplicate timestamps for the same hive are blocked
+- a reading cannot be reassigned to another hive if that would create a timestamp conflict
+- batch offset updates are limited to values between `-20.0` and `+20.0`
 
 ---
 
 ## API capabilities
 
 ### Hive endpoints
+
 Base route: `/api/hives`
 
 Implemented operations:
+
 - create a hive
 - get all hives
 - get hive by id
@@ -118,9 +272,11 @@ Implemented operations:
 - relocate hive
 
 ### Temperature reading endpoints
+
 Base route: `/api/readings`
 
 Implemented operations:
+
 - create a reading
 - get all readings
 - get reading by id
@@ -136,25 +292,26 @@ Implemented operations:
 
 ---
 
-## Business rules
+## Representative API validation
 
-### Hive rules
-- hive name is required
-- hive location is required
-- hive name must be 2 to 50 characters
-- hive location must be 2 to 80 characters
-- hive name must be unique
-- a hive cannot be deleted if temperature readings still exist for it
+In addition to the automated JUnit suite, the REST API was validated manually in Postman against the local Spring Boot back end at `http://localhost:8080`. These representative checks were used to confirm successful retrieval, successful creation, and exception handling through real HTTP requests.
 
-### Temperature reading rules
-- `hiveId` is required when creating or updating a reading
-- temperature is required
-- `recordedAt` is required when recording or updating a reading
-- temperature must be between `-9.0` and `46.5` degrees Celsius
-- `recordedAt` cannot be in the future
-- duplicate timestamps for the same hive are blocked
-- a reading cannot be reassigned to another hive if that would create a timestamp conflict
-- batch offset updates are limited to values between `-20.0` and `+20.0`
+### Hive validation
+
+- `GET /api/hives` returns the current hive list (`200 OK`)
+- `POST /api/hives` creates a new hive (`201 Created`)
+- `GET /api/hives/1` returns a specific hive by id (`200 OK`)
+
+### Temperature reading validation
+
+- `POST /api/readings` creates a new reading for an existing hive (`201 Created`)
+- `GET /api/readings/1` returns a specific reading by id (`200 OK`)
+
+### Exception handling proof
+
+- `GET /api/readings/99999` returns `404 Not Found` for an unknown reading id
+
+These manual checks complement the automated repository, service, and controller tests by showing the API working end to end through real HTTP requests and responses.
 
 ---
 
@@ -163,6 +320,7 @@ Implemented operations:
 A layered JUnit testing suite was added to the back end to verify repository behaviour, service-layer business rules, and controller-level HTTP handling.
 
 ### Test stack
+
 - JUnit 5
 - Mockito
 - `@DataJpaTest` with H2 for repository tests
@@ -171,6 +329,7 @@ A layered JUnit testing suite was added to the back end to verify repository beh
 - JaCoCo coverage reporting for local coverage analysis
 
 ### Test classes
+
 The core layered suite spans six test classes:
 
 - `HiveRepositoryTest`
@@ -182,13 +341,10 @@ The core layered suite spans six test classes:
 
 The layered suite was verified successfully across repository, service, and controller levels, and selected parameterized service tests were then added to strengthen validation coverage further.
 
-### Test execution summary
-The screenshot below shows the final Gradle HTML test summary for the back-end suite.
-
-![Gradle test summary](docs/images/gradle-test-summary.jpg)
-
 ### What is being verified
+
 The test suite verifies:
+
 - repository queries, ordering, averages, and batch updates
 - service-layer business rules such as duplicate hive prevention, blocked delete behaviour, required timestamps, timestamp conflicts, and validation of numeric boundaries
 - controller request and response handling, including expected `201`, `200`, `400`, and `409` outcomes
@@ -196,23 +352,53 @@ The test suite verifies:
 JaCoCo coverage reporting was added to complement the passing JUnit suite and provide a local view of which parts of the back-end code are currently exercised by automated tests.
 
 ### Boundary-focused testing
+
 Additional boundary-focused service tests were added for selected validation rules, including:
+
 - temperature boundaries
 - average window minute boundaries
 - offset delta boundaries
 
 ### Test traceability
+
 A lightweight [requirements-to-test traceability document](docs/test-traceability.md) is included in the repository.
 
-After running `./gradlew test`, open the local Gradle HTML report at `build/reports/tests/test/index.html`.
+The screenshot below shows the final Gradle HTML test summary for the back-end suite.
 
-After running `./gradlew test`, open the local JaCoCo HTML coverage report at `build/reports/jacoco/test/html/index.html`.
+![Gradle test summary](docs/images/gradle-test-summary.jpg)
+
+---
+
+## Evidence
+
+### API proof in Postman
+
+![Postman API proof](docs/images/postman-get-all-hives.jpg)
+
+### Persistence proof in H2
+
+![H2 seeded data proof](docs/images/h2-seeded-data.jpg)
+
+### React front end
+
+#### Hives screen
+
+![Hives screen](docs/images/react-hives-screen.jpg)
+
+#### Temperature readings screen
+
+![Temperature readings screen](docs/images/react-readings-screen.jpg)
+
+#### Relationship update
+
+![Assign Hive dialog](docs/images/react-assign-hive-dialog.jpg)
 
 ---
 
 ## Technology stack
 
 ### Back end
+
 - Java 25 toolchain as configured in Gradle
 - Spring Boot 3
 - Spring Web
@@ -222,11 +408,13 @@ After running `./gradlew test`, open the local JaCoCo HTML coverage report at `b
 - Gradle
 
 ### Front end
+
 - React
 - TypeScript
 - Vite
 
 ### Development and testing
+
 - JUnit 5
 - Mockito
 - Spring `MockMvc`
@@ -238,146 +426,10 @@ After running `./gradlew test`, open the local JaCoCo HTML coverage report at `b
 
 ---
 
-## Running the project locally
-
-### Prerequisites
-- JDK 25 installed
-- Node.js and npm installed
-- Gradle wrapper included in the repository
-
-### Start the back end
-
-From the repository root:
-
-**Windows**
-```bash
-gradlew.bat bootRun
-```
-
-**macOS or Linux**
-```bash
-./gradlew bootRun
-```
-
-The Spring Boot API runs locally at:
-
-```text
-http://localhost:8080
-```
-
-The project includes a safe local development configuration using an in-memory H2 database, so no additional database setup is required for a basic local run.
-
-### Start the front end
-
-From the `frontend` folder:
-
-```bash
-npm install
-npm run dev
-```
-
-The React front end usually runs locally at:
-
-```text
-http://localhost:5173
-```
-
-### Run the automated tests
-
-From the repository root:
-
-```bash
-gradlew.bat cleanTest test
-```
-
-Then open the generated HTML report:
-
-```text
-build/reports/tests/test/index.html
-```
-
-### Local development notes
-- `http://localhost:5173` serves the React front end
-- `http://localhost:8080` serves the Spring Boot back end and REST API
-- a `404` at `http://localhost:8080/` is expected because the back end exposes the API and H2 console, not a browser home page
-- the React app consumes the API from the back end during local development
-
-### H2 console
-```text
-http://localhost:8080/h2-console
-```
-
-Use the following settings:
-- JDBC URL: `jdbc:h2:mem:testdb`
-- User Name: `sa`
-- Password: blank
-
-> These settings are for local development only.
-
----
-
-## Example routes
-
-Representative routes currently supported by the controller mappings include:
-
-### Hive routes
-```text
-GET    /api/hives
-GET    /api/hives/1
-GET    /api/hives/by-name?name=Hive%20A%20(Queen%202026)
-GET    /api/hives/name-contains?name=Hive
-GET    /api/hives/location-contains?name=Garden
-GET    /api/hives/search?nameFragment=Hive
-GET    /api/hives/search?locationFragment=Garden
-GET    /api/hives/search?nameFragment=Hive&locationFragment=Garden
-POST   /api/hives
-PUT    /api/hives/{id}
-DELETE /api/hives/{id}
-PUT    /api/hives/{id}/rename?name=North%20Hive
-PUT    /api/hives/{id}/relocate?location=Orchard
-```
-
-### Temperature reading routes
-```text
-GET    /api/readings
-GET    /api/readings/1
-GET    /api/readings/hive/1
-GET    /api/readings/hive/1/latest
-GET    /api/readings/hive/1/count
-GET    /api/readings/hive/1/average-last-minutes?minutes=60
-GET    /api/readings/hive/1/between?start=2026-03-19T09:00:00&end=2026-03-19T12:00:00
-POST   /api/readings
-PUT    /api/readings/{id}
-DELETE /api/readings/{id}
-PUT    /api/readings/{readingId}/assign-hive/{hiveId}
-PUT    /api/readings/hive/{hiveId}/apply-offset?delta=0.5
-```
-
----
-
-## Evidence
-
-### API proof in Postman
-![Postman API proof](docs/images/postman-get-all-hives.jpg)
-
-### Persistence proof in H2
-![H2 seeded data proof](docs/images/h2-seeded-data.jpg)
-
-### React front end
-#### Hives screen
-![Hives screen](docs/images/react-hives-screen.jpg)
-
-#### Temperature readings screen
-![Temperature readings screen](docs/images/react-readings-screen.jpg)
-
-#### Relationship update
-![Assign Hive dialog](docs/images/react-assign-hive-dialog.jpg)
-
----
-
 ## What this project shows
 
 This repository demonstrates:
+
 - a realistic domain rather than a generic tutorial app
 - a clean layered back-end structure
 - RESTful API design with both CRUD and domain-specific operations
@@ -397,6 +449,7 @@ This repository demonstrates:
 ## Possible future enhancements
 
 Potential future improvements include:
+
 - optionally add SonarQube quality scanning and a CI quality gate
 - expand integration-style API tests for key end-to-end flows
 - extend automated testing further as the domain model grows
