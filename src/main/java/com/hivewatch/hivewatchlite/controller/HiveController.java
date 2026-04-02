@@ -29,7 +29,7 @@ import com.hivewatch.hivewatchlite.service.HiveService;
 
 @RestController
 @RequestMapping("/api/hives")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173")
 public class HiveController {
 
     private final HiveService hiveService;

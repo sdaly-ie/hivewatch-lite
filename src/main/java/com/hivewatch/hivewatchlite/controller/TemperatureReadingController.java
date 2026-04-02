@@ -34,7 +34,7 @@ import com.hivewatch.hivewatchlite.service.TemperatureReadingService;
 //REST controller that exposes TemperatureReading service features as HTTP endpoints for Postman or clients
 @RestController
 @RequestMapping("/api/readings")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:5173")
 public class TemperatureReadingController {
 	
 	// Service that contains the business rules for temperature readings
