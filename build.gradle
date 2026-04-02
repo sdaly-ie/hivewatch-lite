@@ -1,8 +1,9 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.5.10'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id 'jacoco'
+    id 'java'
+    id 'org.springframework.boot' version '3.5.10'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
+    id 'org.sonarqube' version '7.2.3.7755'
 }
 
 group = 'com.hivewatch'
@@ -10,38 +11,42 @@ version = '0.0.1-SNAPSHOT'
 description = 'Assignment 1'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-	runtimeOnly 'com.h2database:h2'
-
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'com.h2database:h2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
-	finalizedBy(tasks.named('jacocoTestReport'))
+    useJUnitPlatform()
+    finalizedBy(tasks.named('jacocoTestReport'))
 }
 
 tasks.named('jacocoTestReport') {
-	dependsOn(tasks.named('test'))
-	reports {
-		xml.required = true
-		html.required = true
-		csv.required = false
-	}
+    dependsOn(tasks.named('test'))
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+sonar {
+    properties {
+        property "sonar.projectKey", "sdaly-ie_hivewatch-lite"
+        property "sonar.organization", "sdaly-ie"
+    }
 }
