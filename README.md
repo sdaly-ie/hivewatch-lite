@@ -24,6 +24,7 @@ This repository is intended to show practical software development skills across
 - front-end and back-end integration
 - service-layer validation beyond thin CRUD
 - automated back-end testing
+- basic front-end component testing
 
 ---
 
@@ -84,6 +85,29 @@ Open a **second terminal** and move into the `frontend` folder:
 
 ```bash
 cd frontend
+```
+
+Create a new file named `.env` in the `frontend` folder.
+
+Do not type the next line into Command Prompt. It must be saved inside the `.env` file.
+
+Example path on Windows:
+
+```text
+C:\Users\Administrator\eclipse-workspace\hivewatchlite\frontend\.env
+```
+
+Paste this line into the file:
+
+```text
+VITE_API_URL=http://localhost:8080
+```
+
+Save the file.
+
+Then run:
+
+```bash
 npm install
 npm run dev
 ```
@@ -129,7 +153,11 @@ Use the following settings:
 
 ### 6. Run the automated tests
 
-From the repository root, run:
+Do not use the terminal windows that are already running the back end or front end.
+
+Open a **new third terminal window** for the test commands.
+
+For the back-end tests, move to the **repository root** and run:
 
 **Windows**
 ```bash
@@ -151,6 +179,13 @@ For local code coverage analysis, open the JaCoCo report at:
 
 ```text
 build/reports/jacoco/test/html/index.html
+```
+
+For the front-end component test, open another terminal in the `frontend` folder and run:
+
+**Windows, macOS, or Linux**
+```bash
+npm run test:run
 ```
 
 ---
@@ -367,6 +402,17 @@ The screenshot below shows the final Gradle HTML test summary for the back-end s
 
 ![Gradle test summary](docs/images/gradle-test-summary.jpg)
 
+## Front-end testing
+
+Basic front-end component testing has been added using Vitest and React Testing Library.
+
+Current automated front-end coverage includes:
+- rendering checks for `HiveFormDialog`
+- edit-state prefill verification
+- save interaction testing with simulated user input
+
+This complements the existing back-end JUnit suite by adding a first layer of automated UI component testing on the React side.
+
 ---
 
 ## Evidence
@@ -414,13 +460,15 @@ The screenshot below shows the final Gradle HTML test summary for the back-end s
 - Vite
 
 ### Development and testing
-
 - JUnit 5
 - Mockito
 - Spring `MockMvc`
 - H2 in-memory database
 - Gradle test execution and HTML test reporting
 - JaCoCo coverage reporting for local coverage analysis
+- Vitest
+- React Testing Library
+- `userEvent` for simulated user interactions
 - Postman
 - browser-based UI testing
 
@@ -441,6 +489,7 @@ This repository demonstrates:
 - relationship editing through the UI
 - local development workflow using H2, Postman, and React
 - a layered automated back-end testing approach across repository, service, and controller levels
+- a first layer of automated front-end component testing with Vitest and React Testing Library
 - boundary-focused automated testing for selected validation rules
 - traceability from selected business rules to automated tests
 
@@ -468,7 +517,6 @@ Potential future improvements include:
 │   │   ├── api/
 │   │   ├── components/
 │   │   └── utils/
-│   ├── .env
 │   ├── package-lock.json
 │   ├── package.json
 │   └── vite.config.ts
