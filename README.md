@@ -9,11 +9,17 @@ It was developed for the **CT5221 Full Stack App Development** module using a re
 
 The application supports CRUD operations for both entities and includes a relationship workflow that allows a temperature reading to be reassigned to a different hive.
 
+## Review snapshot
+
+**Release version:** `v1.0.0`
+
+For reviewers: Start with `v1.0.0 - Review Snapshot (stable)`. The `main` branch may include ongoing updates.
+
 ---
 
 ## Why this project matters
 
-This repository is intended to show practical software development skills across:
+This repository shows practical software development skills across:
 
 - Java and Spring Boot
 - React and TypeScript
@@ -25,6 +31,7 @@ This repository is intended to show practical software development skills across
 - service-layer validation beyond thin CRUD
 - automated back-end testing
 - basic front-end component testing
+- CI-based code quality analysis with SonarQube Cloud
 
 ---
 
@@ -214,6 +221,25 @@ flowchart TD
     L --> N["TemperatureReading"]
 ```
 
+## CI and quality pipeline
+
+The application architecture diagram above focuses on runtime structure. The diagram below shows the separate development and quality workflow used to verify code changes before and after they reach `main`.
+
+```mermaid
+flowchart LR
+    A["Developer change / pull request"] --> B["GitHub Actions"]
+    B --> C["Gradle back-end tests"]
+    B --> D["Vitest front-end component test"]
+    C --> E["JaCoCo XML coverage"]
+    C --> F["Spring Boot build"]
+    F --> G["SonarQube Cloud analysis"]
+    E --> G
+    D --> G
+    G --> H{"Quality Gate"}
+    H -->|Pass| I["Merge / main branch confidence"]
+    H -->|Fail| J["Review issues and fix"]
+```
+
 ---
 
 ## Key features
@@ -224,6 +250,7 @@ flowchart TD
 - layered structure using controller, service, repository, entity, and DTO classes
 - H2 in-memory database for local development
 - MariaDB example configuration included for optional local or future use
+- CORS restricted to `http://localhost:5173` for local front-end access
 
 ### Front end
 
@@ -413,6 +440,18 @@ Current automated front-end coverage includes:
 
 This complements the existing back-end JUnit suite by adding a first layer of automated UI component testing on the React side.
 
+## Code quality and CI
+
+SonarQube Cloud has been integrated through GitHub Actions for CI-based code analysis on pushes to `main` and on pull requests.
+
+The current setup provides:
+- SonarQube Cloud analysis as part of the GitHub Actions workflow
+- a passing quality gate
+- security hotspot review visibility in the repo workflow checks
+- JaCoCo XML coverage input from the Gradle back-end build
+
+This gives the project an additional employer-facing signal beyond local testing by showing automated quality analysis running in CI.
+
 ---
 
 ## Evidence
@@ -469,6 +508,8 @@ This complements the existing back-end JUnit suite by adding a first layer of au
 - Vitest
 - React Testing Library
 - `userEvent` for simulated user interactions
+- SonarQube Cloud
+- GitHub Actions
 - Postman
 - browser-based UI testing
 
@@ -490,6 +531,7 @@ This repository demonstrates:
 - local development workflow using H2, Postman, and React
 - a layered automated back-end testing approach across repository, service, and controller levels
 - a first layer of automated front-end component testing with Vitest and React Testing Library
+- CI-based SonarQube Cloud analysis with a passing quality gate
 - boundary-focused automated testing for selected validation rules
 - traceability from selected business rules to automated tests
 
@@ -499,9 +541,9 @@ This repository demonstrates:
 
 Potential future improvements include:
 
-- optionally add SonarQube quality scanning and a CI quality gate
 - expand integration-style API tests for key end-to-end flows
-- extend automated testing further as the domain model grows
+- add wider front-end component coverage beyond the current dialog-focused test
+- extend automated testing and code quality rules further as the domain model grows
 
 ---
 
@@ -509,6 +551,9 @@ Potential future improvements include:
 
 ```text
 .
+├── .github/
+│   └── workflows/
+│       └── sonar.yml
 ├── docs/
 │   ├── images/
 │   └── test-traceability.md
