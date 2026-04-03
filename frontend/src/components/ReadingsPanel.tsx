@@ -105,6 +105,11 @@ function ReadingsPanel() {
     onError: (error) => setErrorMessage(getApiErrorMessage(error)),
   });
 
+  const isSaving = createMutation.isLoading || updateMutation.isLoading;
+  const isDeleting = deleteMutation.isLoading;
+  const isAssigning = assignMutation.isLoading;
+  const isBusy = isSaving || isDeleting || isAssigning;
+
   const handleSave = (payload: WriteTemperatureReading) => {
     setErrorMessage('');
 
@@ -136,7 +141,7 @@ function ReadingsPanel() {
         </Typography>
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <FormControl size="small" sx={{ minWidth: 220 }}>
+          <FormControl size="small" sx={{ minWidth: 220 }} disabled={isBusy}>
             <InputLabel id="reading-filter-label">Filter by hive</InputLabel>
             <Select
               labelId="reading-filter-label"
@@ -155,87 +160,92 @@ function ReadingsPanel() {
 
           <Button
             variant="contained"
+            disabled={isBusy}
             onClick={() => {
               setEditingReading(null);
               setErrorMessage('');
               setDialogOpen(true);
             }}
           >
-            Add Reading
+            {isSaving ? 'Saving...' : isDeleting ? 'Deleting...' : isAssigning ? 'Reassigning...' : 'Add Reading'}
           </Button>
         </Stack>
       </Stack>
 
       {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
 
-      <TableContainer component={Paper} variant="outlined">
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Temperature</TableCell>
-              <TableCell>Recorded At</TableCell>
-              <TableCell>Hive</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredReadings.map((reading) => (
-              <TableRow key={reading.id}>
-                <TableCell>{reading.id}</TableCell>
-                <TableCell>{reading.temperature} °C</TableCell>
-                <TableCell>{toDisplayDateTime(reading.recordedAt)}</TableCell>
-                <TableCell>{reading.hiveName || `Hive ${reading.hiveId}`}</TableCell>
-                <TableCell align="right">
-                  <Stack direction="row" spacing={1} justifyContent="flex-end" flexWrap="wrap">
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => {
-                        setEditingReading(reading);
-                        setErrorMessage('');
-                        setDialogOpen(true);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => {
-                        setAssigningReading(reading);
-                        setErrorMessage('');
-                        setAssignDialogOpen(true);
-                      }}
-                    >
-                      Assign Hive
-                    </Button>
-                    <Button
-                      size="small"
-                      color="error"
-                      variant="outlined"
-                      onClick={() => {
-                        if (window.confirm(`Delete reading ${reading.id}?`)) {
-                          setErrorMessage('');
-                          deleteMutation.mutate(reading.id);
-                        }
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </Stack>
-                </TableCell>
+      {filteredReadings.length === 0 ? (
+        <Paper variant="outlined" sx={{ p: 4, textAlign: 'center' }}>
+          <Typography variant="h6" gutterBottom>
+            No temperature readings yet
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Click &quot;Add Reading&quot; to create your first reading.
+          </Typography>
+        </Paper>
+      ) : (
+        <TableContainer component={Paper} variant="outlined">
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Hive</TableCell>
+                <TableCell>Temperature (°C)</TableCell>
+                <TableCell>Recorded At</TableCell>
+                <TableCell align="right">Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {filteredReadings.map((reading) => (
+                <TableRow key={reading.id}>
+                  <TableCell>{reading.id}</TableCell>
+                  <TableCell>
+                    {hives.find((hive) => hive.id === reading.hiveId)?.name ?? 'Unknown hive'}
+                  </TableCell>
+                  <TableCell>{reading.temperature.toFixed(1)}</TableCell>
+                  <TableCell>{toDisplayDateTime(reading.recordedAt)}</TableCell>
+                  <TableCell align="right">
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        disabled={isBusy}
+                        onClick={() => {
+                          setEditingReading(reading);
+                          setErrorMessage('');
+                          setDialogOpen(true);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="small"
+                        color="error"
+                        variant="outlined"
+                        disabled={isBusy}
+                        onClick={() => {
+                          if (window.confirm(`Delete reading ${reading.id}?`)) {
+                            setErrorMessage('');
+                            deleteMutation.mutate(reading.id);
+                          }
+                        }}
+                      >
+                        {isDeleting ? 'Deleting...' : 'Delete'}
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <ReadingFormDialog
         open={dialogOpen}
         reading={editingReading}
         hives={hives}
-        saving={createMutation.isLoading || updateMutation.isLoading}
+        saving={isSaving}
         onClose={() => {
           setDialogOpen(false);
           setEditingReading(null);
@@ -247,7 +257,7 @@ function ReadingsPanel() {
         open={assignDialogOpen}
         reading={assigningReading}
         hives={hives}
-        saving={assignMutation.isLoading}
+        saving={isAssigning}
         onClose={() => {
           setAssignDialogOpen(false);
           setAssigningReading(null);

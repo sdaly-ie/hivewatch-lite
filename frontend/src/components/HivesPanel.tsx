@@ -64,6 +64,10 @@ function HivesPanel() {
     onError: (error) => setErrorMessage(getApiErrorMessage(error)),
   });
 
+  const isSaving = createMutation.isLoading || updateMutation.isLoading;
+  const isDeleting = deleteMutation.isLoading;
+  const isBusy = isSaving || isDeleting;
+
   const handleSave = (payload: WriteHive) => {
     setErrorMessage('');
 
@@ -95,76 +99,90 @@ function HivesPanel() {
         </Typography>
         <Button
           variant="contained"
+          disabled={isBusy}
           onClick={() => {
             setEditingHive(null);
             setErrorMessage('');
             setDialogOpen(true);
           }}
         >
-          Add Hive
+          {isSaving ? 'Saving...' : isDeleting ? 'Deleting...' : 'Add Hive'}
         </Button>
       </Stack>
 
       {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
 
-      <TableContainer component={Paper} variant="outlined">
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Location</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {hives.map((hive) => (
-              <TableRow key={hive.id}>
-                <TableCell>{hive.id}</TableCell>
-                <TableCell>{hive.name}</TableCell>
-                <TableCell>{hive.location}</TableCell>
-                <TableCell align="right">
-                  <Stack direction="row" spacing={1} justifyContent="flex-end">
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => {
-                        setEditingHive(hive);
-                        setErrorMessage('');
-                        setDialogOpen(true);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="small"
-                      color="error"
-                      variant="outlined"
-                      onClick={() => {
-                        if (
-                          window.confirm(
-                            `Delete hive ${hive.name}? This will fail if readings still exist for it.`,
-                          )
-                        ) {
-                          setErrorMessage('');
-                          deleteMutation.mutate(hive.id);
-                        }
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </Stack>
-                </TableCell>
+      {hives.length === 0 ? (
+        <Paper variant="outlined" sx={{ p: 4, textAlign: 'center' }}>
+          <Typography variant="h6" gutterBottom>
+            No hives yet
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Click &quot;Add Hive&quot; to create your first hive.
+          </Typography>
+        </Paper>
+      ) : (
+        <TableContainer component={Paper} variant="outlined">
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Location</TableCell>
+                <TableCell align="right">Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {hives.map((hive) => (
+                <TableRow key={hive.id}>
+                  <TableCell>{hive.id}</TableCell>
+                  <TableCell>{hive.name}</TableCell>
+                  <TableCell>{hive.location}</TableCell>
+                  <TableCell align="right">
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        disabled={isBusy}
+                        onClick={() => {
+                          setEditingHive(hive);
+                          setErrorMessage('');
+                          setDialogOpen(true);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="small"
+                        color="error"
+                        variant="outlined"
+                        disabled={isBusy}
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              `Delete hive ${hive.name}? This will fail if readings still exist for it.`,
+                            )
+                          ) {
+                            setErrorMessage('');
+                            deleteMutation.mutate(hive.id);
+                          }
+                        }}
+                      >
+                        {isDeleting ? 'Deleting...' : 'Delete'}
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <HiveFormDialog
         open={dialogOpen}
         hive={editingHive}
-        saving={createMutation.isLoading || updateMutation.isLoading}
+        saving={isSaving}
         onClose={() => {
           setDialogOpen(false);
           setEditingHive(null);

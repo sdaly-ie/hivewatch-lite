@@ -4,13 +4,14 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-  "dev": "vite",
-  "build": "tsc && vite build",
-  "preview": "vite preview",
-  "test": "vitest",
-  "test:run": "vitest run",
-  "test:ui": "vitest --ui"
-},
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:smoke": "node selenium/smoke.mjs"
+  },
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
@@ -31,6 +32,7 @@
     "@vitest/coverage-v8": "^4.1.2",
     "@vitest/ui": "^4.1.2",
     "jsdom": "^29.0.1",
+    "selenium-webdriver": "^4.41.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.10",
     "vitest": "^4.1.2"

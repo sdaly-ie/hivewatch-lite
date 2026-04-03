@@ -1,8 +1,10 @@
 # HiveWatch Lite
 
-HiveWatch Lite is a full-stack beehive monitoring prototype built with a Spring Boot REST API and a React + TypeScript front end.
+[![Review Snapshot](https://img.shields.io/badge/review_snapshot-v1.1.0-blue)](#review-snapshot)
+[![SonarQube Cloud workflow](https://github.com/sdaly-ie/hivewatch-lite/actions/workflows/sonar.yml/badge.svg)](https://github.com/sdaly-ie/hivewatch-lite/actions/workflows/sonar.yml)
+![Local checks](https://img.shields.io/badge/local_checks-JUnit%20%7C%20Vitest%20%7C%20Selenium-6f42c1)
 
-It was developed for the **CT5221 Full Stack App Development** module using a realistic beekeeping domain and manages two related entities:
+HiveWatch Lite is a full-stack beehive monitoring prototype built with a Spring Boot REST API and a React + TypeScript front end. It was developed for the **CT5221 Full Stack App Development** module using a realistic beekeeping domain and manages two related entities:
 
 - `Hive`
 - `TemperatureReading`
@@ -11,9 +13,35 @@ The application supports CRUD operations for both entities and includes a relati
 
 ## Review snapshot
 
-**Release version:** `v1.0.0`
+**Release version:** `v1.1.0`
 
-For reviewers: Start with `v1.0.0 - Review Snapshot (stable)`. The `main` branch may include ongoing updates.
+For reviewers: Start with `v1.1.0 - Review Snapshot (stable)`. The `main` branch may include ongoing updates.
+
+Initial snapshot: `v1.0.0`.
+
+## What's new in `v1.1.0`
+
+- easier front-end startup with `frontend/.env.example` and a default API fallback to `http://localhost:8080`
+- clearer empty states for the Hives and Temperature Readings screens
+- calmer front-end busy-state handling during save, delete, and reassignment actions
+- a browser-level Selenium smoke test for a simple launch check
+- a refreshed README with badges, reviewer guidance, updated local verification steps, and a more accurate CI and quality diagram
+
+## Checks at a glance
+
+This repository includes the following quality signals:
+
+- back-end JUnit coverage across repository, service, and controller layers
+- front-end Vitest and React Testing Library component testing
+- a Selenium smoke test for a basic browser-level front-end launch check
+- SonarQube Cloud analysis in GitHub Actions with a Quality Gate
+
+### Local verification commands
+
+- **Back end:** `gradlew.bat cleanTest test` on Windows or `./gradlew cleanTest test` on macOS or Linux
+- **Front-end component tests:** `npm run test:run`
+- **Front-end smoke test:** `npm run test:smoke`
+- **Front-end production build:** `npm run build`
 
 ---
 
@@ -30,7 +58,8 @@ This repository shows practical software development skills across:
 - front-end and back-end integration
 - service-layer validation beyond thin CRUD
 - automated back-end testing
-- basic front-end component testing
+- front-end component testing
+- browser-level smoke testing
 - CI-based code quality analysis with SonarQube Cloud
 
 ---
@@ -46,17 +75,21 @@ You will need:
 - JDK 25 installed
 - Node.js and npm installed
 - the Gradle wrapper already included in the repository
+- any modern browser to use the app
+- Google Chrome installed locally only if you want to run `npm run test:smoke`
 
 ### 1. Start the back end
 
 Open a terminal in the **repository root** and run:
 
 **Windows**
+
 ```bash
 gradlew.bat bootRun
 ```
 
 **macOS or Linux**
+
 ```bash
 ./gradlew bootRun
 ```
@@ -94,9 +127,21 @@ Open a **second terminal** and move into the `frontend` folder:
 cd frontend
 ```
 
-Create a new file named `.env` in the `frontend` folder.
+Install dependencies:
 
-Do not type the next line into Command Prompt. It must be saved inside the `.env` file.
+```bash
+npm install
+```
+
+### 4. Configure the front end
+
+The repository includes a ready-to-copy example file:
+
+```text
+frontend/.env.example
+```
+
+If you want to make the API target explicit, create a new file named `.env` in the `frontend` folder and copy the value from `.env.example`.
 
 Example path on Windows:
 
@@ -104,7 +149,7 @@ Example path on Windows:
 C:\Users\Administrator\eclipse-workspace\hivewatchlite\frontend\.env
 ```
 
-Paste this line into the file:
+Paste this line into the `.env` file:
 
 ```text
 VITE_API_URL=http://localhost:8080
@@ -112,10 +157,11 @@ VITE_API_URL=http://localhost:8080
 
 Save the file.
 
-Then run:
+> The front end now also falls back to `http://localhost:8080` by default, so local startup still works even if `.env` is missing.
+
+### 5. Run the front end
 
 ```bash
-npm install
 npm run dev
 ```
 
@@ -127,7 +173,7 @@ http://localhost:5173
 
 > If `npm` says it cannot find `package.json`, make sure you are inside the `frontend` folder rather than the repository root.
 
-### 4. Open the application in the browser
+### 6. Open the application in the browser
 
 Once both parts are running, open:
 
@@ -142,7 +188,7 @@ Use the following addresses during local development:
 - `http://localhost:8080/api/hives` for the hive API
 - `http://localhost:8080/api/readings` for the temperature reading API
 
-### 5. Optional: open the H2 console
+### 7. Optional: open the H2 console
 
 The project also exposes the H2 database console locally at:
 
@@ -158,20 +204,22 @@ Use the following settings:
 
 > These settings are for local development only.
 
-### 6. Run the automated tests
+### 8. Run the automated checks
 
-Do not use the terminal windows that are already running the back end or front end.
+Do not use the terminal windows that are already running the back end or front end. Open a **new third terminal window** for the verification commands.
 
-Open a **new third terminal window** for the test commands.
+#### Back-end tests
 
-For the back-end tests, move to the **repository root** and run:
+Move to the **repository root** and run:
 
 **Windows**
+
 ```bash
 gradlew.bat cleanTest test
 ```
 
 **macOS or Linux**
+
 ```bash
 ./gradlew cleanTest test
 ```
@@ -188,11 +236,28 @@ For local code coverage analysis, open the JaCoCo report at:
 build/reports/jacoco/test/html/index.html
 ```
 
-For the front-end component test, open another terminal in the `frontend` folder and run:
+#### Front-end component tests
 
-**Windows, macOS, or Linux**
+Open another terminal in the `frontend` folder and run:
+
 ```bash
 npm run test:run
+```
+
+#### Front-end production build
+
+In the `frontend` folder, run:
+
+```bash
+npm run build
+```
+
+#### Front-end Selenium smoke test
+
+Keep the Vite dev server running, then in another terminal inside `frontend` run:
+
+```bash
+npm run test:smoke
 ```
 
 ---
@@ -205,39 +270,47 @@ The React front end provides the user interface, calls the Spring Boot REST API,
 
 ```mermaid
 flowchart TD
-    A["User in Browser"] --> B["React + TypeScript Front End\nVite dev server"]
-    B --> C["HiveWatch API Client"]
-    C --> D["HiveController"]
-    C --> E["TemperatureReadingController"]
-    D --> F["HiveService / HiveServiceImpl"]
-    E --> G["TemperatureReadingService / TemperatureReadingServiceImpl"]
-    F --> H["HiveRepository"]
-    G --> I["TemperatureReadingRepository"]
-    F --> J["HiveDTO / WriteHiveDTO"]
-    G --> K["TemperatureReadingDTO / WriteTemperatureReadingDTO"]
-    H --> L[("H2 / MariaDB")]
-    I --> L
-    L --> M["Hive"]
-    L --> N["TemperatureReading"]
+  A["User in Browser"] --> B["React + TypeScript Front End\nVite dev server"]
+  B --> C["HiveWatch API Client"]
+  C --> D["HiveController"]
+  C --> E["TemperatureReadingController"]
+  D --> F["HiveService / HiveServiceImpl"]
+  E --> G["TemperatureReadingService / TemperatureReadingServiceImpl"]
+  F --> H["HiveRepository"]
+  G --> I["TemperatureReadingRepository"]
+  F --> J["HiveDTO / WriteHiveDTO"]
+  G --> K["TemperatureReadingDTO / WriteTemperatureReadingDTO"]
+  H --> L[("H2 / MariaDB")]
+  I --> L
+  L --> M["Hive"]
+  L --> N["TemperatureReading"]
 ```
 
 ## CI and quality pipeline
 
-The application architecture diagram above focuses on runtime structure. The diagram below shows the separate development and quality workflow used to verify code changes before and after they reach `main`.
+The application architecture diagram above focuses on runtime structure.
+
+The diagram below separates **local verification** from the current **GitHub Actions CI workflow** so the README does not imply that front-end checks already run in CI when they are currently run locally.
 
 ```mermaid
 flowchart LR
-    A["Developer change / pull request"] --> B["GitHub Actions"]
-    B --> C["Gradle back-end tests"]
-    B --> D["Vitest front-end component test"]
-    C --> E["JaCoCo XML coverage"]
-    C --> F["Spring Boot build"]
-    F --> G["SonarQube Cloud analysis"]
-    E --> G
-    D --> G
-    G --> H{"Quality Gate"}
-    H -->|Pass| I["Merge / main branch confidence"]
-    H -->|Fail| J["Review issues and fix"]
+  A["Developer change"] --> B["Local verification"]
+  B --> C["Gradle JUnit tests"]
+  B --> D["Vitest component tests"]
+  B --> E["Selenium smoke test"]
+  B --> F["Front-end production build"]
+  C --> G["Commit / push / pull request"]
+  D --> G
+  E --> G
+  F --> G
+  G --> H["GitHub Actions: SonarQube Cloud workflow"]
+  H --> I["Gradle build and tests"]
+  I --> J["JaCoCo XML coverage"]
+  I --> K["SonarQube Cloud analysis"]
+  J --> K
+  K --> L{"Quality Gate"}
+  L -->|Pass| M["Merge / main branch confidence"]
+  L -->|Fail| N["Review issues and fix"]
 ```
 
 ---
@@ -259,6 +332,9 @@ flowchart LR
 - create, edit, delete, and filter workflows
 - relationship reassignment through the UI
 - consistent displayed date formatting in the UI
+- clearer empty-state handling for both main tabs
+- action buttons disabled during active save, delete, or reassignment work
+- easier local startup through `.env.example` and a default API fallback
 
 ### Domain behaviour
 
@@ -276,8 +352,12 @@ flowchart LR
 - React
 - TypeScript
 - Vite
+- Axios
+- Material UI
+- TanStack Query
 - API client layer for HTTP requests
 - reusable UI components
+- Selenium smoke script for browser-level launch verification
 
 ### Back end
 
@@ -356,7 +436,9 @@ Implemented operations:
 
 ## Representative API validation
 
-In addition to the automated JUnit suite, the REST API was validated manually in Postman against the local Spring Boot back end at `http://localhost:8080`. These representative checks were used to confirm successful retrieval, successful creation, and exception handling through real HTTP requests.
+In addition to the automated JUnit suite, the REST API was validated manually in Postman against the local Spring Boot back end at `http://localhost:8080`.
+
+These representative checks were used to confirm successful retrieval, successful creation, and exception handling through real HTTP requests.
 
 ### Hive validation
 
@@ -379,7 +461,7 @@ These manual checks complement the automated repository, service, and controller
 
 ## Back-end testing
 
-A layered JUnit testing suite was added to the back end to verify repository behaviour, service-layer business rules, and controller-level HTTP handling.
+A layered JUnit testing suite verifies repository behaviour, service-layer business rules, and controller-level HTTP handling.
 
 ### Test stack
 
@@ -431,23 +513,42 @@ The screenshot below shows the final Gradle HTML test summary for the back-end s
 
 ## Front-end testing
 
-Basic front-end component testing has been added using Vitest and React Testing Library.
+Basic front-end component testing is included using Vitest and React Testing Library.
 
 Current automated front-end coverage includes:
+
 - rendering checks for `HiveFormDialog`
 - edit-state prefill verification
 - save interaction testing with simulated user input
 
-This complements the existing back-end JUnit suite by adding a first layer of automated UI component testing on the React side.
+This complements the back-end JUnit suite by adding a first layer of automated UI component testing on the React side.
+
+## Front-end smoke testing
+
+A lightweight Selenium smoke test is included for a simple browser-level launch check.
+
+The smoke test is intentionally small. It verifies that the front end loads in a real browser session and that key visible text is present.
+
+Current local command:
+
+```bash
+npm run test:smoke
+```
+
+The screenshot below shows a passing local smoke test run.
+
+![Selenium smoke test pass](docs/images/selenium-smoke-test-pass.jpg)
 
 ## Code quality and CI
 
-SonarQube Cloud has been integrated through GitHub Actions for CI-based code analysis on pushes to `main` and on pull requests.
+SonarQube Cloud is integrated through GitHub Actions for CI-based code analysis on pushes to `main` and on pull requests.
 
-The current setup provides:
-- SonarQube Cloud analysis as part of the GitHub Actions workflow
-- a passing quality gate
-- security hotspot review visibility in the repo workflow checks
+The current workflow provides:
+
+- a GitHub Actions workflow at `.github/workflows/sonar.yml`
+- Gradle build and test execution in CI
+- SonarQube Cloud analysis as part of that workflow
+- a Quality Gate outcome in the GitHub checks
 - JaCoCo XML coverage input from the Gradle back-end build
 
 This gives the project an additional employer-facing signal beyond local testing by showing automated quality analysis running in CI.
@@ -478,6 +579,10 @@ This gives the project an additional employer-facing signal beyond local testing
 
 ![Assign Hive dialog](docs/images/react-assign-hive-dialog.jpg)
 
+#### Selenium smoke test
+
+![Selenium smoke test pass](docs/images/selenium-smoke-test-pass.jpg)
+
 ---
 
 ## Technology stack
@@ -497,8 +602,12 @@ This gives the project an additional employer-facing signal beyond local testing
 - React
 - TypeScript
 - Vite
+- Axios
+- Material UI
+- TanStack Query
 
 ### Development and testing
+
 - JUnit 5
 - Mockito
 - Spring `MockMvc`
@@ -508,10 +617,11 @@ This gives the project an additional employer-facing signal beyond local testing
 - Vitest
 - React Testing Library
 - `userEvent` for simulated user interactions
+- Selenium WebDriver
 - SonarQube Cloud
 - GitHub Actions
 - Postman
-- browser-based UI testing
+- browser-based smoke testing
 
 ---
 
@@ -530,8 +640,9 @@ This repository demonstrates:
 - relationship editing through the UI
 - local development workflow using H2, Postman, and React
 - a layered automated back-end testing approach across repository, service, and controller levels
-- a first layer of automated front-end component testing with Vitest and React Testing Library
-- CI-based SonarQube Cloud analysis with a passing quality gate
+- front-end component testing with Vitest and React Testing Library
+- browser-level smoke testing with Selenium
+- CI-based SonarQube Cloud analysis with a Quality Gate
 - boundary-focused automated testing for selected validation rules
 - traceability from selected business rules to automated tests
 
@@ -541,6 +652,8 @@ This repository demonstrates:
 
 Potential future improvements include:
 
+- add a dedicated GitHub Actions job for front-end Vitest checks
+- add a dedicated GitHub Actions job for the Selenium smoke test
 - expand integration-style API tests for key end-to-end flows
 - add wider front-end component coverage beyond the current dialog-focused test
 - extend automated testing and code quality rules further as the domain model grows
@@ -556,14 +669,26 @@ Potential future improvements include:
 │       └── sonar.yml
 ├── docs/
 │   ├── images/
+│   │   ├── gradle-test-summary.jpg
+│   │   ├── h2-seeded-data.jpg
+│   │   ├── postman-get-all-hives.jpg
+│   │   ├── react-assign-hive-dialog.jpg
+│   │   ├── react-hives-screen.jpg
+│   │   ├── react-readings-screen.jpg
+│   │   └── selenium-smoke-test-pass.jpg
 │   └── test-traceability.md
 ├── frontend/
+│   ├── selenium/
+│   │   └── smoke.mjs
 │   ├── src/
 │   │   ├── api/
 │   │   ├── components/
 │   │   └── utils/
+│   ├── .env.example
 │   ├── package-lock.json
 │   ├── package.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
 │   └── vite.config.ts
 ├── gradle/
 │   └── wrapper/
